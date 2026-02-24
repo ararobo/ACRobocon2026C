@@ -3,7 +3,8 @@
 #include <gn10_can/core/can_bus.hpp>
 #include <gn10_can/devices/motor_driver_client.hpp>
 #include "esp32_can_driver.hpp"
-
+#include "mecanum_wheel.hpp"
+MecanumWheel mecanum(0.3f, 0.4f, 0.05f, 45.0f); // 車体幅30cm、車体長40cm、車輪半径5cm、メカナムホイール角度45度
 ESP32CANDriver can_driver;
 gn10_can::CANBus can_bus(can_driver);
 gn10_can::devices::MotorDriverClient motor_wheel_fr(can_bus, 0);
@@ -37,5 +38,19 @@ void setup() {
 
 void loop() {
     if (PS4.isConnected()) {
+        float vx = (PS4.LStickX() / 128.0f) * 1.0f; // 左スティックのX軸を速度に変換
+        float vy = (PS4.LStickY() / 128.0f) * 1.0f; // 左スティックのY軸を速度に変換
+        float omega = (PS4.RStickX() / 128.0f) * 1.0f; // 右スティックのX軸を回転速度
+        // メカナムホイールの速度を計算
+        mecanum.calculate_wheel_speed(vx, vy, omega);
+        float fr, fl, rr, rl;
+        // 車輪の角速度を取得
+        mecanum.get_wheel_angular_velocity(&fr, &fl, &rl, &rr);
+        // 速度をモータードライバーに送信
+        motor_wheel_fr.set_target(fr);
+        motor_wheel_fl.set_target(fl);
+        motor_wheel_rr.set_target(rr);
+        motor_wheel_rl.set_target(rl);
     }
+    delay(10); // 100Hzで制御ループを回す
 }
