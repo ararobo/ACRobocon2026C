@@ -1,0 +1,43 @@
+# .clang-format
+Language: Cpp
+
+BasedOnStyle: Google
+
+# Explicitly set column limit (Google default is 80, but 100 is common for modern screens)
+ColumnLimit: 100
+
+Standard: Latest
+
+IndentWidth: 4
+TabWidth:    4
+UseTab:      Never
+
+PointerAlignment: Left
+# Enforce pointer alignment strictly
+DerivePointerAlignment: false
+
+SortIncludes:  true
+IncludeBlocks: Regroup
+
+IndentCaseLabels: true
+
+AccessModifierOffset: -2
+
+# Put binary operators (except assignments) at the start of wrapped lines
+# BreakBeforeBinaryOperators: NonAssignment
+
+# Align parameters/operands after an open bracket to keep shifts lined up
+# AlignAfterOpenBracket: Align
+
+BinPackArguments: false
+BinPackParameters: false
+
+AlignConsecutiveMacros: true
+
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+
+FixNamespaceComments: true
+
+# Allow simple inline getters (e.g., int get_id() { return id_; }) on one line
+AllowShortFunctionsOnASingleLine: Inline
