@@ -12,20 +12,33 @@ gn10_can::devices::MotorDriverClient motor_wheel_fr(can_bus, 0);
 gn10_can::devices::MotorDriverClient motor_wheel_fl(can_bus, 1);
 gn10_can::devices::MotorDriverClient motor_wheel_rr(can_bus, 2);
 gn10_can::devices::MotorDriverClient motor_wheel_rl(can_bus, 3);
+gn10_can::devices::MotorConfig motor_config_wheel;
 
 void setup() {
+    // モータードライバーの設定
+    motor_config_wheel.set_max_duty_ratio(1.0f);
+    motor_config_wheel.set_accel_ratio(1.0f);
+    motor_config_wheel.set_encoder_type(gn10_can::devices::EncoderType::None);
+    motor_config_wheel.set_feedback_cycle(100);
+
     Serial.begin(115200);
     while (!Serial) {
         ;  // シリアルポートが接続されるのを待つ
     }
     can_driver.setpin(32, 33);
-    if (!can_driver.begin(100E3)) {
+    if (!can_driver.begin(1000E3)) {
         Serial.println("failed to initialize CAN driver!");
         while (true) {
             delay(1000);  // 無限ループで停止
         }
     }
     Serial.println("CAN driver initialized successfully.");
+    // モータードライバーの初期化コマンドを送信
+    motor_wheel_fr.set_init(motor_config_wheel);
+    motor_wheel_fl.set_init(motor_config_wheel);
+    motor_wheel_rr.set_init(motor_config_wheel);
+    motor_wheel_rl.set_init(motor_config_wheel);
+    Serial.println("Motor drivers initialized.");
 
     PS4.begin("c0:5d:89:88:5e:44");  // PS4コントローラーの初期化
     // PS4コントローラーの接続を待つ
