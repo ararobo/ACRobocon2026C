@@ -4,6 +4,7 @@
 #include <gn10_can/devices/motor_driver_client.hpp>
 #include "esp32_can_driver.hpp"
 #include "mecanum_wheel.hpp"
+
 MecanumWheel mecanum(0.3f, 0.4f, 0.05f, 45.0f); // 車体幅30cm、車体長40cm、車輪半径5cm、メカナムホイール角度45度
 ESP32CANDriver can_driver;
 gn10_can::CANBus can_bus(can_driver);
@@ -26,7 +27,7 @@ void setup() {
     }
     Serial.println("CAN driver initialized successfully.");
 
-    PS4.begin();  // PS4コントローラーの初期化
+    PS4.begin("c0:5d:89:88:5e:44");  // PS4コントローラーの初期化
     // PS4コントローラーの接続を待つ
     Serial.println("Waiting for PS4 controller connection...");
     while (!PS4.isConnected()) {
