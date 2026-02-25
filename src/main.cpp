@@ -18,7 +18,7 @@ void setup() {
     while (!Serial) {
         ;  // シリアルポートが接続されるのを待つ
     }
-    can_driver.setpin(4, 5);  // RXピンをGPIO4、TXピンをGPIO5に設定
+    can_driver.setpin(32, 33);
     if (!can_driver.begin(100E3)) {
         Serial.println("failed to initialize CAN driver!");
         while (true) {
