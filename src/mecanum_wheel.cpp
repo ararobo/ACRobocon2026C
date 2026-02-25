@@ -10,8 +10,10 @@ MecanumWheel::MecanumWheel(float chassis_width, float chassis_length, float whee
 
 void MecanumWheel::convert_coord(float *vx, float *vy, float theta)
 {
-    *vx = cos(theta) * *vx + sin(theta) * *vy;  // x軸方向の速度
-    *vy = -sin(theta) * *vx + cos(theta) * *vy; // y軸方向の速度
+    // 上書き前の原値を保持してから行列演算する
+    const float vx_orig = *vx;
+    *vx = cosf(theta) * vx_orig  + sinf(theta) * *vy;  // x軸方向の速度
+    *vy = -sinf(theta) * vx_orig + cosf(theta) * *vy;  // y軸方向の速度
 }
 
 void MecanumWheel::calculate_wheel_speed(float vx, float vy, float omega)
