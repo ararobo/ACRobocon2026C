@@ -1,14 +1,20 @@
 #include <Arduino.h>
 #include <PS4Controller.h>
+
 #include <gn10_can/core/can_bus.hpp>
 #include <gn10_can/devices/motor_driver_client.hpp>
+
 #include "esp32_can_driver.hpp"
 #include "mecanum_wheel.hpp"
 
 /// PS4スティックのデッドゾーン比率 (10%)
 constexpr float DEADZONE_RATIO = 0.1f;
 
-MecanumWheel mecanum(0.3f, 0.4f, 3.0f, 45.0f); // 車体幅30cm、車体長40cm、車輪半径は無視して出力値の制限として利用、メカナムホイール角度45度
+MecanumWheel mecanum(
+    0.3f,
+    0.4f,
+    3.0f,
+    45.0f);  // 車体幅30cm、車体長40cm、車輪半径は無視して出力値の制限として利用、メカナムホイール角度45度
 ESP32CANDriver can_driver;
 gn10_can::CANBus can_bus(can_driver);
 gn10_can::devices::MotorDriverClient motor_wheel_fr(can_bus, 0);
@@ -64,26 +70,26 @@ void setup() {
         delay(1000);
     }
     Serial.println("PS4 controller connected.");
-
 }
 
 void loop() {
     if (PS4.isConnected()) {
         // デッドゾーン適用済みの正規化スティック入力を取得
-        float vx    = apply_deadzone(PS4.LStickX(), DEADZONE_RATIO); // 左スティックX軸 → 横移動速度
-        float vy    = apply_deadzone(PS4.LStickY(), DEADZONE_RATIO); // 左スティックY軸 → 縦移動速度
-        float omega = apply_deadzone(PS4.RStickX(), DEADZONE_RATIO); // 右スティックX軸 → 旋回速度
+        float vx = apply_deadzone(PS4.LStickX(), DEADZONE_RATIO);  // 左スティックX軸 → 横移動速度
+        float vy = apply_deadzone(PS4.LStickY(), DEADZONE_RATIO);  // 左スティックY軸 → 縦移動速度
+        float omega = apply_deadzone(PS4.RStickX(), DEADZONE_RATIO);  // 右スティックX軸 → 旋回速度
         // メカナムホイールの速度を計算
         mecanum.calculate_wheel_speed(vx, vy, omega);
         float fr, fl, rr, rl;
         // 車輪の角速度を取得
         mecanum.get_wheel_angular_velocity(&fr, &fl, &rl, &rr);
         // 速度をモータードライバーに送信
-        Serial.printf("Wheel Speeds (rad/s) - FR: %.2f, FL: %.2f, RR: %.2f, RL: %.2f\n", fr, fl, rr, rl);
+        Serial.printf(
+            "Wheel Speeds (rad/s) - FR: %.2f, FL: %.2f, RR: %.2f, RL: %.2f\n", fr, fl, rr, rl);
         motor_wheel_fr.set_target(fr);
         motor_wheel_fl.set_target(fl);
         motor_wheel_rr.set_target(rr);
         motor_wheel_rl.set_target(rl);
     }
-    delay(10); // 100Hzで制御ループを回す
+    delay(10);  // 100Hzで制御ループを回す
 }
