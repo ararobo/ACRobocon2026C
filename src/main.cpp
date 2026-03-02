@@ -21,6 +21,10 @@ gn10_can::devices::MotorDriverClient motor_wheel_fr(can_bus, 0);
 gn10_can::devices::MotorDriverClient motor_wheel_fl(can_bus, 1);
 gn10_can::devices::MotorDriverClient motor_wheel_rr(can_bus, 2);
 gn10_can::devices::MotorDriverClient motor_wheel_rl(can_bus, 3);
+gn10_can::devices::MotorDriverClient motor_wheel_rarm(can_bus, 4);
+gn10_can::devices::MotorDriverClient motor_wheel_larm(can_bus, 5);
+gn10_can::devices::MotorDriverClient motor_wheel_power(can_bus, 6);
+gn10_can::devices::MotorDriverClient motor_wheel_injection(can_bus, 7);
 gn10_can::devices::MotorConfig motor_config_wheel;
 
 /**
@@ -29,7 +33,8 @@ gn10_can::devices::MotorConfig motor_config_wheel;
  * @param deadzone_ratio デッドゾーンの比率 (0.0 ~ 1.0)
  * @return デッドゾーン適用済みの正規化値 (-1.0 ~ 1.0)
  */
-static float apply_deadzone(int8_t raw, float deadzone_ratio) {
+static float apply_deadzone(int8_t raw,
+                            float deadzone_ratio) {  // もしデッドゾーンだったら値を０にする
     const float normalized = raw / 128.0f;
     if (fabsf(normalized) < deadzone_ratio) {
         return 0.0f;
@@ -90,6 +95,31 @@ void loop() {
         motor_wheel_fl.set_target(fl);
         motor_wheel_rr.set_target(rr);
         motor_wheel_rl.set_target(rl);
+
+        if (PS4.Triangle()) {
+            motor_wheel_rarm.set_target(1.0f);  // 右アームを正転
+        } else if (PS4.Cross()) {
+            motor_wheel_rarm.set_target(-1.0f);  // 右アームを逆転
+        } else {
+            motor_wheel_rarm.set_target(0.0f);  // 右アームを停止
+        };
+
+        if (PS4.UpLeft()) {
+            motor_wheel_larm.set_target(1.0f);  // 左アームを正転
+        } else if (PS4.DownLeft()) {
+            motor_wheel_larm.set_target(-1.0f);  // 左アームを逆転
+        } else {
+            motor_wheel_larm.set_target(0.0f);  // 左アームを停止
+        };
+
+        if (PS4.R1()) {
+            motor_wheel_power.set_target(1.0f);  // 巻き取る
+        } else if (PS4.L1()) {
+            motor_wheel_power.set_target(-1.0f);  // 繰り出す
+        } else {
+            motor_wheel_power.set_target(0.0f);  // 停止
+        };
+
+        delay(10);  // 100Hzで制御ループを回す
     }
-    delay(10);  // 100Hzで制御ループを回す
 }
