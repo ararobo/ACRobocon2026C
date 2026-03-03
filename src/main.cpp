@@ -25,6 +25,7 @@ gn10_can::devices::MotorDriverClient motor_wheel_rarm(can_bus, 4);
 gn10_can::devices::MotorDriverClient motor_wheel_larm(can_bus, 5);
 gn10_can::devices::MotorDriverClient motor_wheel_power(can_bus, 6);
 gn10_can::devices::MotorDriverClient motor_wheel_injection(can_bus, 7);
+
 gn10_can::devices::MotorConfig motor_config_wheel;
 
 /**
