@@ -3,6 +3,7 @@
 
 #include <gn10_can/core/can_bus.hpp>
 #include <gn10_can/devices/motor_driver_client.hpp>
+#include <gn10_can/devices/servo_motor_client.hpp>
 
 #include "esp32_can_driver.hpp"
 #include "mecanum_wheel.hpp"
@@ -32,6 +33,9 @@ gn10_can::devices::MotorConfig motor_config_arm;
 gn10_can::devices::MotorConfig motor_config_power;
 gn10_can::devices::MotorConfig motor_config_fry;
 
+gn10_can::devices::ServoMotorClient servo_left(can_bus, 0);
+gn10_can::devices::ServoMotorClient servo_right(can_bus, 1);
+gn10_can::devices::ServoMotorClient servo_center(can_bus, 2);
 /**
  * @brief PS4スティック入力にデッドゾーンを適用し、正規化された値を返す
  * @param raw    PS4スティックの生値 (-128 ~ 127)
@@ -88,6 +92,9 @@ void setup() {
     motor_wheel_power.set_init(motor_config_power);
     motor_wheel_l_fry.set_init(motor_config_fry);
     motor_wheel_r_fry.set_init(motor_config_fry);
+    servo_left.set_init(500, 2500);  // サーボの初期化 (最小500us、最大2500us)
+    servo_right.set_init(500, 2500);  // サーボの初期化 (最小500us、最大2500us)
+    servo_center.set_init(500, 2500);  // サーボの初期化 (最小500us、最大2500us)
     Serial.println("Motor drivers initialized.");
 
     PS4.begin("c0:5d:89:88:5e:44");  // PS4コントローラーの初期化
