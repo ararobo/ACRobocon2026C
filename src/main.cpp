@@ -24,7 +24,8 @@ gn10_can::devices::MotorDriverClient motor_wheel_rl(can_bus, 3);
 gn10_can::devices::MotorDriverClient motor_wheel_right_arm_up(can_bus, 4);
 gn10_can::devices::MotorDriverClient motor_wheel_left_arm_up(can_bus, 5);
 gn10_can::devices::MotorDriverClient motor_wheel_power(can_bus, 6);
-gn10_can::devices::MotorDriverClient motor_wheel_fry(can_bus, 7);
+gn10_can::devices::MotorDriverClient motor_wheel_l_fry(can_bus, 7);
+gn10_can::devices::MotorDriverClient motor_wheel_r_fry(can_bus, 8);
 
 gn10_can::devices::MotorConfig motor_config_wheel;
 gn10_can::devices::MotorConfig motor_config_arm;
@@ -53,7 +54,7 @@ void setup() {
     motor_config_wheel.set_encoder_type(gn10_can::devices::EncoderType::None);
     motor_config_wheel.set_feedback_cycle(100);
     // モータードライバアームの設定
-    motor_config_arm.set_max_duty_ratio(0.2f);
+    motor_config_arm.set_max_duty_ratio(0.1f);
     motor_config_arm.set_accel_ratio(1.0f);
     motor_config_arm.set_encoder_type(gn10_can::devices::EncoderType::None);
     // モータードライバパワーの設定
@@ -85,7 +86,8 @@ void setup() {
     motor_wheel_right_arm_up.set_init(motor_config_arm);
     motor_wheel_left_arm_up.set_init(motor_config_arm);
     motor_wheel_power.set_init(motor_config_power);
-    motor_wheel_fry.set_init(motor_config_fry);
+    motor_wheel_l_fry.set_init(motor_config_fry);
+    motor_wheel_r_fry.set_init(motor_config_fry);
     Serial.println("Motor drivers initialized.");
 
     PS4.begin("c0:5d:89:88:5e:44");  // PS4コントローラーの初期化
@@ -117,9 +119,9 @@ void loop() {
         motor_wheel_rl.set_target(rl);
 
         if (PS4.Triangle()) {
-            motor_wheel_right_arm_up.set_target(1.0f);  // 右アームを正転
+            motor_wheel_right_arm_up.set_target(-1.0f);  // 右アームを正転
         } else if (PS4.Cross()) {
-            motor_wheel_right_arm_up.set_target(-1.0f);  // 右アームを逆転
+            motor_wheel_right_arm_up.set_target(1.0f);  // 右アームを逆転
         } else {
             motor_wheel_right_arm_up.set_target(0.0f);  // 右アームを停止
         };
@@ -141,9 +143,15 @@ void loop() {
         };
 
         if (PS4.Touchpad()) {
-            motor_wheel_fry.set_target(1.0f);  // 回す
+            motor_wheel_l_fry.set_target(1.0f);  // 回す
         } else {
-            motor_wheel_fry.set_target(0.0f);  // 停止
+            motor_wheel_l_fry.set_target(0.0f);  // 停止
+        };
+
+        if (PS4.Touchpad()) {
+            motor_wheel_r_fry.set_target(-1.0f);  // 回す
+        } else {
+            motor_wheel_r_fry.set_target(0.0f);  // 停止
         };
 
         delay(10);  // 100Hzで制御ループを回す
