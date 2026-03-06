@@ -36,6 +36,11 @@ gn10_can::devices::MotorConfig motor_config_fry;
 gn10_can::devices::ServoMotorClient servo_left(can_bus, 0);
 gn10_can::devices::ServoMotorClient servo_right(can_bus, 1);
 gn10_can::devices::ServoMotorClient servo_center(can_bus, 2);
+
+float servo_left_angle   = PI / 2.0f;  // 左サーボの角度 (ラジアン)
+float servo_right_angle  = PI / 2.0f;  // 右サーボの角度 (ラジアン)
+float servo_center_angle = PI / 2.0f;  // 中央サーボの角度 (ラジアン)
+
 /**
  * @brief PS4スティック入力にデッドゾーンを適用し、正規化された値を返す
  * @param raw    PS4スティックの生値 (-128 ~ 127)
@@ -92,8 +97,8 @@ void setup() {
     motor_wheel_power.set_init(motor_config_power);
     motor_wheel_l_fry.set_init(motor_config_fry);
     motor_wheel_r_fry.set_init(motor_config_fry);
-    servo_left.set_init(500, 2500);  // サーボの初期化 (最小500us、最大2500us)
-    servo_right.set_init(500, 2500);  // サーボの初期化 (最小500us、最大2500us)
+    servo_left.set_init(500, 2500);    // サーボの初期化 (最小500us、最大2500us)
+    servo_right.set_init(500, 2500);   // サーボの初期化 (最小500us、最大2500us)
     servo_center.set_init(500, 2500);  // サーボの初期化 (最小500us、最大2500us)
     Serial.println("Motor drivers initialized.");
 
@@ -118,8 +123,6 @@ void loop() {
         // 車輪の角速度を取得
         mecanum.get_wheel_angular_velocity(&fr, &fl, &rl, &rr);
         // 速度をモータードライバーに送信
-        Serial.printf(
-            "Wheel Speeds (rad/s) - FR: %.2f, FL: %.2f, RR: %.2f, RL: %.2f\n", fr, fl, rr, rl);
         motor_wheel_fr.set_target(fr);
         motor_wheel_fl.set_target(fl);
         motor_wheel_rr.set_target(rr);
@@ -161,6 +164,33 @@ void loop() {
             motor_wheel_r_fry.set_target(0.0f);  // 停止
         };
 
+        if (PS4.Square()) {
+            servo_left_angle -= 0.01f;
+        } else if (PS4.Circle()) {
+            servo_left_angle += 0.01f;
+        }
+
+        if (PS4.Up()) {
+            servo_right_angle += 0.01f;
+        } else if (PS4.Down()) {
+            servo_right_angle -= 0.01f;
+        }
+
+        if (PS4.R2()) {
+            servo_center_angle += 0.01f;
+        } else if (PS4.L2()) {
+            servo_center_angle -= 0.01f;
+        }
+
+        Serial.printf("Servo Angles (deg) - L: %.1f, R: %.1f, C: %.1f\n",
+                      servo_left_angle * 180.0f / PI,
+                      servo_right_angle * 180.0f / PI,
+                      servo_center_angle * 180.0f / PI);
+
+        // サーボの角度を送信
+        servo_left.set_angle_rad(servo_left_angle);
+        servo_right.set_angle_rad(servo_right_angle);
+        servo_center.set_angle_rad(servo_center_angle);
         delay(10);  // 100Hzで制御ループを回す
     }
 }
