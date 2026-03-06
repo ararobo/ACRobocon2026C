@@ -34,8 +34,8 @@ gn10_can::devices::MotorConfig motor_config_power;
 gn10_can::devices::MotorConfig motor_config_fry;
 
 gn10_can::devices::ServoMotorClient servo_left(can_bus, 0);
-gn10_can::devices::ServoMotorClient servo_right(can_bus, 1);
-gn10_can::devices::ServoMotorClient servo_center(can_bus, 2);
+gn10_can::devices::ServoMotorClient servo_right(can_bus, 2);
+gn10_can::devices::ServoMotorClient servo_center(can_bus, 1);
 
 float servo_left_angle   = PI / 2.0f;  // 左サーボの角度 (ラジアン)
 float servo_right_angle  = PI / 2.0f;  // 右サーボの角度 (ラジアン)
@@ -167,15 +167,15 @@ void loop() {
         };
 
         if (PS4.Square()) {
-            servo_left_angle -= 0.01f;
+            servo_right_angle += 0.01f;
         } else if (PS4.Circle()) {
-            servo_left_angle += 0.01f;
+            servo_right_angle -= 0.01f;
         }
 
         if (PS4.Right()) {
-            servo_right_angle += 0.01f;
+            servo_left_angle += 0.01f;
         } else if (PS4.Left()) {
-            servo_right_angle -= 0.01f;
+            servo_left_angle -= 0.01f;
         }
 
         if (PS4.R2()) {
