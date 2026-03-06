@@ -41,6 +41,8 @@ float servo_left_angle   = PI / 2.0f;  // 左サーボの角度 (ラジアン)
 float servo_right_angle  = PI / 2.0f;  // 右サーボの角度 (ラジアン)
 float servo_center_angle = PI / 2.0f;  // 中央サーボの角度 (ラジアン)
 
+float turn_multiplier = 4.0f;  // 旋回速度の倍率
+
 /**
  * @brief PS4スティック入力にデッドゾーンを適用し、正規化された値を返す
  * @param raw    PS4スティックの生値 (-128 ~ 127)
@@ -118,7 +120,7 @@ void loop() {
         float vy = apply_deadzone(PS4.LStickY(), DEADZONE_RATIO);  // 左スティックY軸 → 縦移動速度
         float omega = apply_deadzone(PS4.RStickX(), DEADZONE_RATIO);  // 右スティックX軸 → 旋回速度
         // メカナムホイールの速度を計算
-        mecanum.calculate_wheel_speed(vx, vy, omega);
+        mecanum.calculate_wheel_speed(vx, vy, omega * turn_multiplier);
         float fr, fl, rr, rl;
         // 車輪の角速度を取得
         mecanum.get_wheel_angular_velocity(&fr, &fl, &rl, &rr);
