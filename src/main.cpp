@@ -172,9 +172,9 @@ void loop() {
             servo_left_angle += 0.01f;
         }
 
-        if (PS4.Up()) {
+        if (PS4.Right()) {
             servo_right_angle += 0.01f;
-        } else if (PS4.Down()) {
+        } else if (PS4.Left()) {
             servo_right_angle -= 0.01f;
         }
 
