@@ -14,7 +14,7 @@ constexpr float DEADZONE_RATIO = 0.1f;
 MecanumWheel mecanum(
     0.3f,
     0.4f,
-    3.0f,
+    2.0f,
     45.0f);  // 車体幅30cm、車体長40cm、車輪半径は無視して出力値の制限として利用、メカナムホイール角度45度
 ESP32CANDriver can_driver;
 gn10_can::CANBus can_bus(can_driver);
@@ -63,13 +63,12 @@ void setup() {
     motor_config_wheel.set_max_duty_ratio(1.0f);
     motor_config_wheel.set_accel_ratio(1.0f);
     motor_config_wheel.set_encoder_type(gn10_can::devices::EncoderType::None);
-    motor_config_wheel.set_feedback_cycle(100);
     // モータードライバアームの設定
-    motor_config_arm.set_max_duty_ratio(0.1f);
+    motor_config_arm.set_max_duty_ratio(0.17f);
     motor_config_arm.set_accel_ratio(1.0f);
     motor_config_arm.set_encoder_type(gn10_can::devices::EncoderType::None);
     // モータードライバパワーの設定
-    motor_config_power.set_max_duty_ratio(0.2f);
+    motor_config_power.set_max_duty_ratio(0.4f);
     motor_config_power.set_accel_ratio(1.0f);
     motor_config_power.set_encoder_type(gn10_can::devices::EncoderType::None);
     // モータードライバ射出の設定
